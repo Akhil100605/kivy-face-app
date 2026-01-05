@@ -49,21 +49,21 @@ jobs:
           unzip commandlinetools-linux-11076708_latest.zip
           mv cmdline-tools latest
 
-          # Persist env vars for next steps
+          # Persist env vars
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/build-tools/33.0.2" >> $GITHUB_PATH
 
-          # Accept licenses
+          # ACCEPT ALL LICENSES (THIS IS THE KEY)
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
 
-          # Install required SDK packages (THIS INSTALLS aidl)
+          # INSTALL EXACT BUILD-TOOLS REQUIRED BY BUILDOZER
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
             "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.2"
+            "platforms;android-34" \
+            "build-tools;36.0.0" \
+            "build-tools;36.1.0"
 
 
       - name: Create virtual environment
