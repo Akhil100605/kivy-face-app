@@ -42,9 +42,6 @@ jobs:
           sudo apt install -y wget unzip
 
           ANDROID_HOME=$HOME/android-sdk
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-
           mkdir -p $ANDROID_HOME/cmdline-tools
           cd $ANDROID_HOME/cmdline-tools
 
@@ -52,19 +49,21 @@ jobs:
           unzip commandlinetools-linux-11076708_latest.zip
           mv cmdline-tools latest
 
+          # Persist env vars for next steps
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
           echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
           echo "$ANDROID_HOME/build-tools/33.0.2" >> $GITHUB_PATH
 
-          sdkmanager --sdk_root=$ANDROID_HOME --licenses <<EOF
-          y
-          EOF
+          # Accept licenses
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
 
-          sdkmanager --sdk_root=$ANDROID_HOME \
+          # Install required SDK packages (THIS INSTALLS aidl)
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
             "platform-tools" \
             "platforms;android-33" \
             "build-tools;33.0.2"
-
 
 
       - name: Create virtual environment
