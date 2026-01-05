@@ -38,24 +38,26 @@ jobs:
           echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
       - name: Install Android SDK and accept licenses
         run: |
-          sudo mkdir -p /usr/lib/android-sdk
-          sudo chown -R $USER:$USER /usr/lib/android-sdk
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-          export ANDROID_HOME=/usr/lib/android-sdk
-          echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
-          echo "/usr/lib/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "/usr/lib/android-sdk/platform-tools" >> $GITHUB_PATH
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export ANDROID_HOME=$HOME/android-sdk
 
-          curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip cmdline-tools.zip
-          mkdir -p /usr/lib/android-sdk/cmdline-tools/latest
-          mv cmdline-tools/* /usr/lib/android-sdk/cmdline-tools/latest/
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
 
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools"
-          "platforms;android-31"
-          "build-tools;36.0.0"
+          curl -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip tools.zip
+          mv cmdline-tools latest
+
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
+
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-31" \
+            "build-tools;36.0.0"
 
       - name: Create virtual environment
         run: |
