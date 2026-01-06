@@ -15,7 +15,8 @@ except ImportError:
 import cv2
 import os
 import numpy as np
-
+BASE_DIR=os.path.dirname(__file__)
+cascade_path=os.path.join(BASE_DIR,"haarcascade_frontalface_default.xml")
 
 class FaceApp(App):
 
@@ -25,9 +26,7 @@ class FaceApp(App):
         layout.add_widget(self.image)
 
         # Haar cascade
-        self.face_cascade = cv2.CascadeClassifier(
-            "haarcascade_frontalface_default.xml"
-        )
+        self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
         # Face recognizer
         self.recognizer = cv2.face.LBPHFaceRecognizer_create()
