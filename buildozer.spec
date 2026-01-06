@@ -38,7 +38,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10,kivy==2.2.1
+requirements = python3,kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -138,7 +138,7 @@ android.built_tools_version = 36.0.0
 # agreements. This is intended for automation only. If set to False,
 # the default, you will be shown the license when first running
 android.accept_sdk_license = True
-
+android.python_version=3.10
 # (str) Android entry point, default is ok for Kivy-based app
 #android.entrypoint = org.kivy.android.PythonActivity
 
