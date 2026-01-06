@@ -1,12 +1,20 @@
-import os
-import cv2
-import numpy as np
-from android.permissions import request_permissions, Permission, check_permission
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 from kivy.uix.boxlayout import BoxLayout
+try:
+    from android.permissions import request_permissions, Permission, check_permission
+    request_permissions([
+        Permission.CAMERA,
+        Permission.READ_EXTERNAL_STORAGE,
+        Permission.WRITE_EXTERNAL_STORAGE
+    ])
+except ImportError:
+    pass
+import cv2
+import os
+import numpy as np
 
 
 class FaceApp(App):
