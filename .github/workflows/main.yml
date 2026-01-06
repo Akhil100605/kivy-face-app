@@ -1,81 +1,50 @@
-name: Build Android APK with Buildozer
+name: Build APK
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
+      - name: Verify Python
+        run: |
+          python --version
+          which python
 
       - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y \
-            python3 \
-            python3-pip \
-            python3-venv \
+            build-essential \
             git \
             zip \
             unzip \
             openjdk-17-jdk \
-            build-essential \
             libffi-dev \
             libssl-dev \
-            libjpeg-dev \
-            zlib1g-dev \
-            liblzma-dev
-
-      - name: Set JAVA_HOME
-        run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
-      - name: Install Android SDK and Build Tools
-        run: |
-          sudo apt update
-          sudo apt install -y wget unzip
-
-          ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          cd $ANDROID_HOME/cmdline-tools
-
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip commandlinetools-linux-11076708_latest.zip
-          mv cmdline-tools latest
-
-          # Persist env vars
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-
-          # ACCEPT ALL LICENSES (THIS IS THE KEY)
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses
-
-          # INSTALL EXACT BUILD-TOOLS REQUIRED BY BUILDOZER
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME \
-            "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;36.0.0" \
-            "build-tools;36.1.0"
-
+            libsqlite3-dev
 
       - name: Create virtual environment
         run: |
-          python3 -m venv venv
+          python -m venv venv
           source venv/bin/activate
-          pip install --upgrade pip
-          pip install buildozer cython
+          pip install --upgrade pip setuptools wheel
+
+      - name: Install Buildozer and pinned python-for-android
+        run: |
+          source venv/bin/activate
+          pip install buildozer
+          pip install "python-for-android==2023.09.16"
 
       - name: Build APK
         run: |
