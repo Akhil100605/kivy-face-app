@@ -1,9 +1,9 @@
 from kivy.app import App
-from kivy.uix.bonlayout import BoxLayout
+from kivy.uix.label import Label
 
 class TestApp(App):
     def build(self):
-        return  BoxLayout()
+        return  Label(text="App started successfully")
 
 if __name__ == "__main__":
-    FaceApp().run()
+    TestApp().run()
