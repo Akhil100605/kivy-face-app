@@ -33,6 +33,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install cython==0.29.36
         pip install buildozer
+    - name: Remove system Android NDK
+      run: sudo rm -rf /usr/local/lib/android/sdk/ndk
+    - name: Clean buildozer cache
+      run: rm -rf .buildozer
 
     - name: Build APK
       run: |
