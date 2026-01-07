@@ -40,9 +40,11 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip setuptools wheel
 
-      - name: Install Buildozer and pinned python-for-android
+      - name: Install Buildozer , Cython and pinned python-for-android
         run: |
           source venv/bin/activate
+          pip install --upgrade pip setuptools wheel
+          pip install cython
           pip install buildozer
           pip install "python-for-android==2023.09.16"
 
