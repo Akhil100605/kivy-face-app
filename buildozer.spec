@@ -1,6 +1,3 @@
-[buildozer]
-
-log_level = 2
 
 [app]
 
