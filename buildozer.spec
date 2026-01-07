@@ -14,7 +14,7 @@ package.domain = org.test
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,kv
+source.include_exts = py,kv,png,jpg
 source.main = main.py
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
@@ -38,7 +38,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.10,kivy==2.2.1,sh==1.14.3
+requirements = python3,kivy,sh
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -97,15 +97,15 @@ fullscreen = 0
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
-andriod.permissions = CAMERA,READ_EXTERNAL-STORAGE,WRITE_EXTERNAL_STORAGE
+andriod.permissions = CAMERA,READ_EXTERNAL-STORAGE,WRITE_EXTERNAL_STORAGE,INTERNET
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 31
+android.api = 30
 
 # (int) Minimum API your APK / AAB will support.
-android.minapi = 24
+android.minapi = 21
 
 # (int) Android SDK version to use
 #android.sdk = 20
@@ -292,7 +292,7 @@ android.archs = arm64-v8a
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
-p4a.bootstrap = sdl2
+android.bootstrap = sdl2
 
 # (str) XML file for custom backup rules (see official auto backup documentation)
 # android.backup_rules =
