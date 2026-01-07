@@ -38,7 +38,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy
+requirements = python3,kivy==2.2.1,opencv
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -292,7 +292,7 @@ android.archs = arm64-v8a,armeabi-v7a
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
-android.bootstrap = sdl2
+p4a.bootstrap = sdl2
 
 # (str) XML file for custom backup rules (see official auto backup documentation)
 # android.backup_rules =
