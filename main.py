@@ -1,3 +1,5 @@
+from kivy.core.window import Window
+Window.rotation = 0
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
@@ -20,14 +22,14 @@ class CamApp(App):
         layout.add_widget(self.cam)
         layout.add_widget(Label(text="Camera ON 📸"))
 
-        Clock.schedule_once(self.fix_rotation, 1)
+Clock.schedule_once(self.fix_camera, 1)
         return layout
 
-    def fix_rotation(self, dt):
+    def fix_camera(self, dt):
         # rotate camera texture to portrait
         if self.cam.texture:
-            self.cam.texture.flip_vertical()
             self.cam.rotation = 90
+self.cam.texture.flip_vertical()
 
 
 if __name__ == "__main__":
