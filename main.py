@@ -5,7 +5,6 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.uix.label import Label
-from kivy.clock import Clock
 from kivy.graphics import PushMatrix, PopMatrix, Rotate
 from android.permissions import request_permissions, Permission
 
@@ -30,11 +29,15 @@ class CamApp(App):
 
         layout = BoxLayout(orientation="vertical")
 
-        self.cam = RotatedCamera(play=True, resolution=(640, 480))
-        self.cam.allow_stretch = True
-        self.cam.keep_ratio = True
-        layout.add_widget(self.cam)
+        cam = RotatedCamera(play=True, resolution=(640, 480))
+        cam.allow_stretch = True
+        cam.keep_ratio = True
+
+        layout.add_widget(cam)
         layout.add_widget(Label(text="Camera ON"))
+
         return layout
-if_name_ == "_main_" :
-   CamApp().run()
+
+
+if __name__ == "__main__":
+    CamApp().run()
