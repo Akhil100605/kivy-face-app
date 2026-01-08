@@ -14,8 +14,8 @@ class RotatedCamera(Camera):
         super().__init__(**kwargs)
         with self.canvas.before:
             PushMatrix()
-            self.rot = Rotate(angle=90, origin=self.center)
-            self.scale = Scale(x=1, y=1, z=1, origin=self.center)
+            self.rot = Rotate(angle=270, origin=self.center)
+            self.scale = Scale(x=1, y=-1, z=1, origin=self.center)
         with self.canvas.after:
             PopMatrix()
         self.bind(pos=self.update_transform, size=self.update_transform)
