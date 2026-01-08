@@ -1,143 +1,151 @@
 import os
 import cv2
 import numpy as np
+import time
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.image import Image
 from kivy.uix.button import Button
+from kivy.uix.camera import Camera
+from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.graphics.texture import Texture
+from kivy.graphics import Color, Line
+from kivy.core.window import Window
 
-FACE_DIR = "faces"
+Window.rotation = 0
+from android.permissions import request_permissions, Permission
+
+request_permissions([
+    Permission.CAMERA,
+    Permission.READ_EXTERNAL_STORAGE,
+    Permission.WRITE_EXTERNAL_STORAGE
+])
 
 
 class FaceApp(App):
 
     def build(self):
-        os.makedirs(FACE_DIR, exist_ok=True)
+        self.cam_index = 0
 
-        self.cam_index = 0  # 0 = back, 1 = front
+        self.base_dir = os.getcwd()
+        self.face_dir = os.path.join(self.base_dir, "faces")
+        os.makedirs(self.face_dir, exist_ok=True)
 
-        self.layout = BoxLayout(orientation="vertical")
-
-        self.img = Image()
-        self.layout.add_widget(self.img)
-
-        btn_layout = BoxLayout(size_hint_y=0.2)
-
-        self.enroll_btn = Button(text="Enroll")
-        self.enroll_btn.bind(on_press=self.enroll_face)
-
-        self.rec_btn = Button(text="Recognize")
-        self.rec_btn.bind(on_press=self.recognize_face)
-
-        self.switch_btn = Button(text="Switch Cam")
-        self.switch_btn.bind(on_press=self.switch_camera)
-
-        btn_layout.add_widget(self.enroll_btn)
-        btn_layout.add_widget(self.rec_btn)
-        btn_layout.add_widget(self.switch_btn)
-
-        self.layout.add_widget(btn_layout)
-
-        # Open camera
-        self.cap = cv2.VideoCapture(self.cam_index)
-
-        # Face detector
-        self.face_cascade = cv2.CascadeClassifier(
-            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        self.cascade = cv2.CascadeClassifier(
+            os.path.join(self.base_dir, "haarcascade_frontalface_default.xml")
         )
 
-        Clock.schedule_interval(self.update, 1.0 / 30)
+        self.recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-        return self.layout
+        self.labels = {}
+        self.train_model()
 
-    # ---------------- CAMERA PREVIEW ----------------
-    def update(self, dt):
-        ret, frame = self.cap.read()
-        if not ret:
-            return
+        root = BoxLayout(orientation="vertical")
 
-        buf = cv2.flip(frame, 0).tobytes()
-        texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt="bgr")
-        texture.blit_buffer(buf, colorfmt="bgr", bufferfmt="ubyte")
-        self.img.texture = texture
+        self.camera = Camera(index=self.cam_index, play=True, resolution=(640, 480))
+        root.add_widget(self.camera)
 
-    # ---------------- SWITCH CAMERA ----------------
+        btns = BoxLayout(size_hint_y=None, height=60)
+
+        self.enroll_btn = Button(text="Enroll")
+        self.switch_btn = Button(text="Switch")
+
+        self.enroll_btn.bind(on_press=self.enroll_face)
+        self.switch_btn.bind(on_press=self.switch_camera)
+
+        btns.add_widget(self.enroll_btn)
+        btns.add_widget(self.switch_btn)
+        root.add_widget(btns)
+
+        Clock.schedule_interval(self.detect_faces, 1 / 10)
+
+        return root
+
     def switch_camera(self, *args):
         self.cam_index = 1 if self.cam_index == 0 else 0
-        self.cap.release()
-        self.cap = cv2.VideoCapture(self.cam_index)
+        self.camera.index = self.cam_index
 
-    # ---------------- ENROLL FACE ----------------
+    def texture_to_cv2(self, texture):
+        size = texture.size
+        buf = np.frombuffer(texture.pixels, np.uint8)
+        frame = buf.reshape(size[1], size[0], 4)
+        frame = frame[:, :, :3]
+        return frame
+
     def enroll_face(self, *args):
-        ret, frame = self.cap.read()
-        if not ret:
+        tex = self.camera.texture
+        if not tex:
             return
 
+        frame = self.texture_to_cv2(tex)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+
+        faces = self.cascade.detectMultiScale(gray, 1.3, 5)
 
         if len(faces) == 0:
             print("No face found")
             return
 
         x, y, w, h = faces[0]
-        face = gray[y:y + h, x:x + w]
+        face_img = gray[y:y+h, x:x+w]
 
-        count = len(os.listdir(FACE_DIR))
-        path = os.path.join(FACE_DIR, f"face_{count}.png")
-        cv2.imwrite(path, face)
+        name = f"user_{int(time.time())}.jpg"
+        path = os.path.join(self.face_dir, name)
+        cv2.imwrite(path, face_img)
+
         print("Saved:", path)
+        self.train_model()
 
-    # ---------------- RECOGNIZE FACE ----------------
-    def recognize_face(self, *args):
-        files = os.listdir(FACE_DIR)
-        if len(files) == 0:
-            print("No enrolled faces")
-            return
-
-        images = []
+    def train_model(self):
+        faces = []
         labels = []
+        self.labels = {}
 
-        for i, f in enumerate(files):
-            img = cv2.imread(os.path.join(FACE_DIR, f), cv2.IMREAD_GRAYSCALE)
-            images.append(img)
-            labels.append(i)
+        label_id = 0
 
-        recognizer = cv2.face.LBPHFaceRecognizer_create()
-        recognizer.train(images, np.array(labels))
+        for file in os.listdir(self.face_dir):
+            if not file.lower().endswith((".png", ".jpg", ".jpeg")):
+                continue
 
-        ret, frame = self.cap.read()
-        if not ret:
+            path = os.path.join(self.face_dir, file)
+            img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            if img is None:
+                continue
+
+            faces.append(img)
+            labels.append(label_id)
+            self.labels[label_id] = file
+            label_id += 1
+
+        if len(faces) > 0:
+            self.recognizer.train(faces, np.array(labels))
+            print("Model trained")
+
+    def detect_faces(self, dt):
+        tex = self.camera.texture
+        if not tex:
             return
 
+        frame = self.texture_to_cv2(tex)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
-        for (x, y, w, h) in faces:
-            face = gray[y:y + h, x:x + w]
-            label, confidence = recognizer.predict(face)
+        faces = self.cascade.detectMultiScale(gray, 1.3, 5)
 
-            if confidence < 80:
-                color = (0, 255, 0)
-                text = "Known"
-            else:
-                color = (0, 0, 255)
-                text = "Unknown"
+        self.camera.canvas.after.clear()
+        with self.camera.canvas.after:
+            for (x, y, w, h) in faces:
+                label = "Unknown"
+                color = (1, 0, 0)
 
-            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-            cv2.putText(frame, text, (x, y - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+                if len(self.labels) > 0:
+                    roi = gray[y:y+h, x:x+w]
+                    id_, conf = self.recognizer.predict(roi)
+                    if conf < 80:
+                        label = self.labels.get(id_, "Known")
+                        color = (0, 1, 0)
 
-        buf = cv2.flip(frame, 0).tobytes()
-        texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt="bgr")
-        texture.blit_buffer(buf, colorfmt="bgr", bufferfmt="ubyte")
-        self.img.texture = texture
-
-    def on_stop(self):
-        self.cap.release()
+                Color(*color)
+                Line(rectangle=(x, y, w, h), width=2)
 
 
 if __name__ == "__main__":
