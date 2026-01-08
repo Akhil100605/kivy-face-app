@@ -1,12 +1,27 @@
 from kivy.core.window import Window
 Window.rotation = 0
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.uix.label import Label
 from kivy.clock import Clock
-
+from kivy.graphics import PushMatrix, PopMatrix, Rotate
 from android.permissions import request_permissions, Permission
+
+
+class RotatedCamera(Camera):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            PushMatrix()
+            self.rot = Rotate(angle=90, origin=self.center)
+        with self.canvas.after:
+            PopMatrix()
+        self.bind(pos=self.update_origin, size=self.update_origin)
+
+    def update_origin(self, *args):
+        self.rot.origin = self.center
 
 
 class CamApp(App):
@@ -15,22 +30,11 @@ class CamApp(App):
 
         layout = BoxLayout(orientation="vertical")
 
-        self.cam = Camera(play=True, resolution=(640, 480))
+        self.cam = RotatedCamera(play=True, resolution=(640, 480))
         self.cam.allow_stretch = True
         self.cam.keep_ratio = True
-
         layout.add_widget(self.cam)
-        layout.add_widget(Label(text="Camera ON 📸"))
-
-        Clock.schedule_once(self.fix_camera, 1)
+        layout.add_widget(Label(text="Camera ON"))
         return layout
-
-    def fix_camera(self, dt):
-        # rotate camera texture to portrait
-        if self.cam.texture:
-            self.cam.rotation = 90
-        self.cam.texture.flip_vertical()
-
-
-if __name__ == "__main__":
-    CamApp().run()
+if__name__ == "__main__":
+   CamApp().run()
