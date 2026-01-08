@@ -21,7 +21,6 @@ request_permissions([
     Permission.WRITE_EXTERNAL_STORAGE
 ])
 
-
 class FaceApp(App):
 
     def build(self):
