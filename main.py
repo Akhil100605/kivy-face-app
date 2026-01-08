@@ -22,14 +22,14 @@ class CamApp(App):
         layout.add_widget(self.cam)
         layout.add_widget(Label(text="Camera ON 📸"))
 
-Clock.schedule_once(self.fix_camera, 1)
+        Clock.schedule_once(self.fix_camera, 1)
         return layout
 
     def fix_camera(self, dt):
         # rotate camera texture to portrait
         if self.cam.texture:
             self.cam.rotation = 90
-self.cam.texture.flip_vertical()
+        self.cam.texture.flip_vertical()
 
 
 if __name__ == "__main__":
