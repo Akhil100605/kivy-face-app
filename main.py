@@ -36,5 +36,5 @@ class CamApp(App):
         layout.add_widget(self.cam)
         layout.add_widget(Label(text="Camera ON"))
         return layout
-if__name__ == "__main__":
+if__name__ == "__main__" :
    CamApp().run()
