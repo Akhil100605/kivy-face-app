@@ -2,8 +2,7 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.uix.button import Button
-from android.permisions import
-request_permissions, Permission
+from android.permissions import request_permissions, Permission
 
 class CameraApp(App):
     def build(self):
@@ -28,7 +27,7 @@ Permision.WRITE_EXTERNAL_STORAGE
         layout.add_widget(self.camera)
 
         btn = Button(text="Switch Camera", size_hint_y=None, height=60)
-btn.bind(on_press=self.switch_camera)
+        btn.bind(on_press=self.switch_camera)
         layout.add_widget(btn)
 
         return layout
