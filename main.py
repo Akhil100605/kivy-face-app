@@ -28,7 +28,7 @@ Permision.WRITE_EXTERNAL_STORAGE
         layout.add_widget(self.camera)
 
         btn = Button(text="Switch Camera", size_hint_y=None, height=60)
-        btn.bind(on_press=self.switch_camera)
+btn.bind(on_press=self.switch_camera)
         layout.add_widget(btn)
 
         return layout
