@@ -44,10 +44,12 @@ jobs:
          java-version: '17'
     - name: Force JAVA_HOME
       run: echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
-
+    - name: Clean Buildozer
+      run: |
+        rm -rf .buildozer
     - name: Build APK
       run: |
-        buildozer -v android debug
+        buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
