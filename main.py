@@ -2,10 +2,16 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.uix.button import Button
-
+from android.permisions import
+request_permissions, Permission
 
 class CameraApp(App):
     def build(self):
+        request_permissions([
+            Permission.CAMERA,
+Permission.READ_EXTERNAL_STORAGE,
+Permision.WRITE_EXTERNAL_STORAGE
+       ])
         self.cam_index = 0  # 0 = back, 1 = front
 
         layout = BoxLayout(orientation='vertical')
@@ -13,7 +19,7 @@ class CameraApp(App):
         self.camera = Camera(
             index=self.cam_index,
             play=True,
-            resolution=(1280, 720),
+            resolution=(640, 480),
             size_hint=(1, 1),
             allow_stretch=True,
             keep_ratio=False   # FULL SCREEN
