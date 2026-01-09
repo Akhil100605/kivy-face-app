@@ -2,34 +2,54 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.camera import Camera
 from kivy.uix.button import Button
+from kivy.core.window import Window
+from kivy.graphics import Scale, Translate
+
 from android.permissions import request_permissions, Permission
 
-request_permissions([
-    Permission.CAMERA,
-    Permission.READ_EXTERNAL_STORAGE,
-    Permission.WRITE_EXTERNAL_STORAGE
-])
+
 class CameraApp(App):
     def build(self):
         request_permissions([Permission.CAMERA])
 
+        Window.rotation = 0
+
         self.cam_index = 0
 
-        layout = BoxLayout(orientation='vertical')
+        self.layout = BoxLayout(orientation='vertical')
 
-        self.camera = Camera(index=self.cam_index, play=True)
-
-        layout.add_widget(self.camera)
+        self.add_camera()
 
         btn = Button(text="Switch Camera", size_hint_y=None, height=60)
         btn.bind(on_press=self.switch_camera)
-        layout.add_widget(btn)
+        self.layout.add_widget(btn)
 
-        return layout
+        return self.layout
+
+    def add_camera(self):
+        self.camera = Camera(index=self.cam_index, play=True)
+
+        with self.camera.canvas.before:
+            self.scale = Scale(x=-1 if self.cam_index == 1 else 1, y=1, z=1)
+            self.translate = Translate()
+
+        self.camera.bind(size=self.update_transform, pos=self.update_transform)
+
+        self.layout.add_widget(self.camera, index=1)
+
+    def update_transform(self, *args):
+        if self.cam_index == 1:  # mirror only front cam
+            self.translate.x = -self.camera.width
+        else:
+            self.translate.x = 0
+        self.translate.y = 0
 
     def switch_camera(self, *args):
+        self.layout.remove_widget(self.camera)
+        self.camera.play = False
+
         self.cam_index = 1 if self.cam_index == 0 else 0
-        self.camera.index = self.cam_index
+        self.add_camera()
 
 
 if __name__ == "__main__":
