@@ -14,7 +14,7 @@ package.domain = org.test
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,kv,png,jpg,xml,pkl,atlas
+source.include_exts = py,kv,png,jpg,xml
 source.main = main.py
 # (list) List of inclusions using pattern matching
 source.include_patterns = faces/*
@@ -38,7 +38,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy==2.3.0,pillow,numpy,opencv-python-headless==4.9.0.80
+requirements = python3,kivy,camera4kivy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -323,7 +323,7 @@ android.bootstrap = sdl2
 #p4a.fork = kivy
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = develop
+p4a.branch = master
 
 # (str) python-for-android specific commit to use, defaults to HEAD, must be within p4a.branch
 #p4a.commit = HEAD
