@@ -14,7 +14,7 @@ package.domain = org.test
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,kv,png,jpg,kv,xml
+source.include_exts = py,kv,png,jpg,xml,pkl,atlas
 source.main = main.py
 # (list) List of inclusions using pattern matching
 source.include_patterns = faces/*
@@ -38,7 +38,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,camera4kivy
+requirements = python3,kivy==2.3.0,pillow,numpy,opencv-python-headless==4.9.0.80
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -68,7 +68,7 @@ orientation = portrait
 osx.python_version = 3
 
 # Kivy version to use
-osx.kivy_version = 1.9.1
+osx.kivy_version = 2.2.0
 
 #
 # Android specific
@@ -178,7 +178,7 @@ android.python_version=3.10
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-#android.add_src =
+android.add_src = haarcascade_frontalface_default.xml
 
 # (list) Android AAR archives to add
 #android.add_aars =
