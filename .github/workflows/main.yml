@@ -16,6 +16,14 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+    - name: Build with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        buildozer_version: master
+        # This command tells buildozer to create the AAB for release
+        command: buildozer android release
+        repository_root: .
 
     - name: Install system dependencies
       run: |
