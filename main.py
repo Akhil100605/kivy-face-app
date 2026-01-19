@@ -1,52 +1,31 @@
 from kivy.app import App
-from kivy.uix.image import Image
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
 
-import cv2
-import numpy as np
-
-from android.permissions import request_permissions, Permission
+from camera4kivy import Preview
 
 
 class CamApp(App):
     def build(self):
-        self.img = Image()
-        self.cap = None
+        layout = BoxLayout(orientation="vertical")
 
-        request_permissions([Permission.CAMERA], self.on_permission)
-        return self.img
-
-    def on_permission(self, permissions, results):
-        if all(results):
-            self.cap = cv2.VideoCapture(0)
-            Clock.schedule_interval(self.update, 1 / 30)
-
-    def update(self, dt):
-        if self.cap is None:
-            return
-
-        ret, frame = self.cap.read()
-        if not ret:
-            return
-
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = cv2.flip(frame, 1)
-
-        texture = Texture.create(
-            size=(frame.shape[1], frame.shape[0]),
-            colorfmt='rgb'
+        self.preview = Preview(
+            aspect_ratio="fill",
+            enable_zoom=True,
+            camera_id="back"   # "front" or "back"
         )
-        texture.blit_buffer(
-            frame.tobytes(),
-            colorfmt='rgb',
-            bufferfmt='ubyte'
-        )
-        self.img.texture = texture
 
-    def on_stop(self):
-        if self.cap:
-            self.cap.release()
+        btn = Button(text="Switch Camera", size_hint_y=None, height=60)
+        btn.bind(on_press=self.switch_camera)
+
+        layout.add_widget(self.preview)
+        layout.add_widget(btn)
+        return layout
+
+    def switch_camera(self, *args):
+        self.preview.camera_id = (
+            "front" if self.preview.camera_id == "back" else "back"
+        )
 
 
 if __name__ == "__main__":
