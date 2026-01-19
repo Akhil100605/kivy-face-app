@@ -1,31 +1,41 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from camera4kivy import Preview
-from kivy.uix.button import Button
+from kivy.uix.image import Image
+from kivy.clock import Clock
+from kivy.graphics.texture import Texture
+
+import cv2
+import numpy as np
 
 
 class CamApp(App):
     def build(self):
-        layout = BoxLayout(orientation="vertical")
+        self.img = Image()
+        self.cap = cv2.VideoCapture(0)
 
-        self.preview = Preview(
-            camera_id="0",
-            aspect_ratio="fit"
+        Clock.schedule_interval(self.update, 1 / 30)
+        return self.img
+
+    def update(self, dt):
+        ret, frame = self.cap.read()
+        if not ret:
+            return
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = cv2.flip(frame, 1)  # mirror fix
+
+        texture = Texture.create(
+            size=(frame.shape[1], frame.shape[0]),
+            colorfmt='rgb'
         )
-
-        btn = Button(
-            text="Switch Camera",
-            size_hint_y=None,
-            height=60
+        texture.blit_buffer(
+            frame.tobytes(),
+            colorfmt='rgb',
+            bufferfmt='ubyte'
         )
-        btn.bind(on_press=self.switch_camera)
+        self.img.texture = texture
 
-        layout.add_widget(self.preview)
-        layout.add_widget(btn)
-        return layout
-
-    def switch_camera(self, *args):
-        self.preview.camera_id = "1" if self.preview.camera_id == "0" else "0"
+    def on_stop(self):
+        self.cap.release()
 
 
 if __name__ == "__main__":
