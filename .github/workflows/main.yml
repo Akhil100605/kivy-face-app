@@ -42,9 +42,9 @@ jobs:
           pip install buildozer
       - name: HARD CLEAN
         run: |
-          rm-rf .buildozer
-          rm-rf ~/.buildozer
-          rm-rf ~/.cache/buildozer
+          rm -rf .buildozer
+          rm -rf ~/.buildozer
+          rm -rf ~/.cache/buildozer
 
       - name: Build APK
         run: |
