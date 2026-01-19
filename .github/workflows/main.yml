@@ -45,7 +45,11 @@ jobs:
           rm -rf .buildozer
           rm -rf ~/.buildozer
           rm -rf ~/.cache/buildozer
-
+      - name: Debug Buildozer version
+        run: |
+          which buildozer
+          buildozer --version
+          pip show buildozer
       - name: Build APK
         run: |
           buildozer -v android debug
