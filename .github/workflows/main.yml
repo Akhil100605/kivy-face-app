@@ -32,15 +32,19 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
 
       # ✅ MUST BE DEVELOP (AAB support)
-      - name: Install python-for-android (develop)
+      - name: Install python-for-android (stable)
         run: |
-          pip uninstall -y python-for-android || true
-          pip install git+https://github.com/kivy/python-for-android.git@develop
+          pip install python-for-android==202.09.16
 
       - name: Install Buildozer
         run: |
           pip install cython==0.29.36
           pip install buildozer
+      - name: HARD CLEAN
+        run: |
+          rm-rf .buildozer
+          rm-rf ~/.buildozer
+          rm-rf ~/.cache/buildozer
 
       - name: Build APK
         run: |
