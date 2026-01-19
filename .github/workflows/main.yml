@@ -34,7 +34,7 @@ jobs:
       # ✅ MUST BE DEVELOP (AAB support)
       - name: Install python-for-android (stable)
         run: |
-          pip install python-for-android==202.09.16
+          pip install python-for-android==2023.09.16
 
       - name: Install Buildozer
         run: |
