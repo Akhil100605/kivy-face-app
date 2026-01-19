@@ -9,10 +9,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
@@ -21,39 +20,36 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y \
+          openjdk-17-jdk \
           build-essential \
-          ccache \
           git \
           zip \
-          unzip \
-          openjdk-17-jdk
+          unzip
 
-    # 🔥 PASTE HERE 🔥
-    - name: Force clean Python tools
+    - name: Force Java 17
       run: |
-        pip uninstall -y buildozer python-for-android
+        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        echo "/usr/lib/jvm/java-17-openjdk-amd64/bin" >> $GITHUB_PATH
+
+    - name: Clean python tools
+      run: |
+        pip uninstall -y buildozer python-for-android || true
         pip cache purge
 
-    - name: Install pinned Buildozer (APK only)
+    - name: Install pinned tools (APK only)
       run: |
-        pip install buildozer==1.5.0
-    # 🔥 END HERE 🔥
-    - name: Install Cythom
-      run: |
-        pip install --upgrade pip
         pip install cython==0.29.36
+        pip install python-for-android==2023.9.16
+        pip install buildozer==1.5.0
 
     - name: Clean buildozer cache
-      run: |
-        rm -rf .buildozer
-        rm -rf ~/.buildozer
+      run: rm -rf .buildozer
 
     - name: Build APK
-      run: |
-        buildozer android debug
+      run: buildozer android debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
+        name: apk
         path: bin/*.apk
