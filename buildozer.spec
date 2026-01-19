@@ -104,7 +104,7 @@ android.permissions = CAMERA
 # (int) Target Android API, should be as high as possible.
 android.api = 33
 
-# (int) Minimum API your APK / AAB will support.
+# (int) Minimum API your APK  will support.
 android.minapi = 24
 
 # (int) Android SDK version to use
@@ -306,7 +306,7 @@ p4a.bootstrap = sdl2
 # (bool) Skip byte compile for .py files
 # android.no-byte-compile-python = False
 
-# (str) The format used to package the app for release mode (aab or apk or aar).
+# (str) The format used to package the app for release mode (apk or aar).
 
 
 # (str) The format used to package the app for debug mode (apk or aar).
@@ -413,7 +413,7 @@ warn_on_root = 1
 # (str) Path to build artifact storage, absolute or relative to spec file
 # build_dir = ./.buildozer
 
-# (str) Path to build output (i.e. .apk, .aab, .ipa) storage
+# (str) Path to build output (i.e. .apk,  .ipa) storage
 # bin_dir = ./bin
 
 #    -----------------------------------------------------------------------------
