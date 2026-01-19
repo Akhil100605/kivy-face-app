@@ -1,4 +1,4 @@
-
+WW
 [app]
 
 # (str) Title of your application
@@ -311,7 +311,8 @@ p4a.bootstrap = sdl2
 
 # (str) The format used to package the app for debug mode (apk or aar).
 # android.debug_artifact = apk
-
+android.debug = 1
+android.release =0
 #
 # Python for android (p4a) specific
 #
